@@ -1,21 +1,33 @@
+import sys
 import socket
+import threading
 
-# Create socket
-ADDRESS = '168.122.216.154'
-PORT = 8081
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-server.bind((ADDRESS,PORT))
-server.listen()
-
-conn, addr = server.accept()
-
-with conn:
-    print(f"Connected by {addr}")
+#TODO: exit program when client ends the connection
+def connect(conn):
     while True:
-            data = conn.recv(1024)
-            print(f"Received: {data}")
-            if not data:
-                break
-            conn.sendall(data)
+        received = conn.recv(1024)
+        if received ==' ':
+            pass
+        else:
+            print(received.decode())
 
+def sendMsg(conn):
+    while True:
+        send_msg = input().replace('b', '').encode()
+        if send_msg == ' ':
+            pass
+        else:
+            conn.sendall(send_msg)
+
+if __name__ == '__main__':
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(('172.22.176.1', 11111))
+    s.listen()
+    (conn, addr) = s.accept() 
+    thread1 = threading.Thread(target = connect, args = ([conn]))
+    thread2 = threading.Thread(target = sendMsg, args = ([conn]))
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()
